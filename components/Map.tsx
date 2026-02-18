@@ -8,7 +8,7 @@ import { spots } from '@/lib/spots'
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN!
 
 export interface MapHandle {
-  flyTo: (lng: number, lat: number) => void
+  openSpot: (id: number, lng: number, lat: number) => void
 }
 
 const Map = forwardRef<MapHandle>((_, ref) => {
@@ -17,8 +17,14 @@ const Map = forwardRef<MapHandle>((_, ref) => {
   const markers = useRef<{ [id: number]: mapboxgl.Marker }>({})
 
   useImperativeHandle(ref, () => ({
-    flyTo: (lng: number, lat: number) => {
-      map.current?.flyTo({ center: [lng, lat], zoom: 14 })
+    openSpot: (id: number, lng: number, lat: number) => {
+      // close all popups first
+      Object.values(markers.current).forEach(m => m.getPopup()?.remove())
+      // fly then open
+      map.current?.flyTo({ center: [lng, lat], zoom: 15 })
+      map.current?.once('moveend', () => {
+        markers.current[id]?.togglePopup()
+      })
     }
   }))
 

@@ -16,7 +16,7 @@ export default function BerlinPage() {
         <p className="text-gray-500 mt-1">Your local beer guide · 3 spots</p>
       </div>
       <Map ref={mapRef} />
-      <SpotList onSpotClick={(lng, lat) => mapRef.current?.flyTo(lng, lat)} />
+	  <SpotList onSpotClick={(id, lng, lat) => mapRef.current?.openSpot(id, lng, lat)} />
     </main>
   )
 }

@@ -1,7 +1,7 @@
 import { spots } from '@/lib/spots'
 
 interface Props {
-  onSpotClick: (lng: number, lat: number) => void
+  onSpotClick: (id: number, lng: number, lat: number) => void
 }
 
 export default function SpotList({ onSpotClick }: Props) {
@@ -10,7 +10,7 @@ export default function SpotList({ onSpotClick }: Props) {
       {spots.map(spot => (
         <div
           key={spot.id}
-          onClick={() => onSpotClick(spot.lng, spot.lat)}
+		  onClick={() => onSpotClick(spot.id, spot.lng, spot.lat)}
           className="border border-gray-200 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow"
         >
           <div className="font-bold text-lg">{spot.name}</div>
