@@ -5,8 +5,8 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Beer Map",
-  description: "Discover the best craft beer spots near you",
+  title: "HopTrotter",
+  description: "Your local beer guide",
 };
 
 export default function RootLayout({
