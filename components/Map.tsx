@@ -14,7 +14,8 @@ export default function Map() {
     if (map.current) return
     map.current = new mapboxgl.Map({
       container: mapContainer.current!,
-      style: 'mapbox://styles/mapbox/streets-v12',
+    //   style: 'mapbox://styles/mapbox/streets-v12',
+		style: 'mapbox://styles/mapbox/navigation-night-v1',
       center: [13.405, 52.52],
       zoom: 12
     })
@@ -34,7 +35,7 @@ export default function Map() {
         }).setHTML(`
 		<div style="font-family: inherit;">
 			<div style="font-weight: 700; font-size: 15px; margin-bottom: 4px; padding-right: 20px;">${spot.name}</div>
-			<div style="color: #666; font-size: 13px;">${spot.address}</div>
+			<div style="color: #666; font-size: 12px;">${spot.address}</div>
 		</div>
 		`)
 
