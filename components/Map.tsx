@@ -3,22 +3,24 @@
 import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react'
 import maplibregl from 'maplibre-gl'
 import 'maplibre-gl/dist/maplibre-gl.css'
-import { spots } from '@/lib/spots'
+import { Spot } from '@/lib/spots'
 
 export interface MapHandle {
   openSpot: (id: number, lng: number, lat: number) => void
 }
 
-const Map = forwardRef<MapHandle>((_, ref) => {
+interface MapProps {
+  spots: Spot[]
+}
+
+const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
   const markers = useRef<{ [id: number]: maplibregl.Marker }>({})
 
   useImperativeHandle(ref, () => ({
     openSpot: (id: number, lng: number, lat: number) => {
-      // close all popups first
       Object.values(markers.current).forEach(m => m.getPopup()?.remove())
-      // fly then open
       map.current?.flyTo({ center: [lng, lat], zoom: 15 })
       map.current?.once('moveend', () => {
         markers.current[id]?.togglePopup()
@@ -26,16 +28,22 @@ const Map = forwardRef<MapHandle>((_, ref) => {
     }
   }))
 
+  // Init map
   useEffect(() => {
     if (map.current) return
     map.current = new maplibregl.Map({
       container: mapContainer.current!,
-      style: 'https://tiles.openfreemap.org/styles/positron', // free, no token!
+      style: 'https://tiles.openfreemap.org/styles/positron',
       center: [13.405, 52.52],
       zoom: 12
     })
+  }, [])
 
-    map.current.on('load', () => {
+  // Add markers when spots load
+  useEffect(() => {
+    if (!map.current || spots.length === 0) return
+
+    const addMarkers = () => {
       spots.forEach(spot => {
         const popup = new maplibregl.Popup({
           closeButton: true,
@@ -55,8 +63,14 @@ const Map = forwardRef<MapHandle>((_, ref) => {
 
         markers.current[spot.id] = marker
       })
-    })
-  }, [])
+    }
+
+    if (map.current.isStyleLoaded()) {
+      addMarkers()
+    } else {
+      map.current.on('load', addMarkers)
+    }
+  }, [spots])
 
   return <div ref={mapContainer} className="w-full h-[600px]" />
 })

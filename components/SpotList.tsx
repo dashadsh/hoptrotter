@@ -1,16 +1,17 @@
-import { spots } from '@/lib/spots'
+import { Spot } from '@/lib/spots'
 
 interface Props {
+  spots: Spot[]
   onSpotClick: (id: number, lng: number, lat: number) => void
 }
 
-export default function SpotList({ onSpotClick }: Props) {
+export default function SpotList({ spots, onSpotClick }: Props) {
   return (
     <div className="px-8 py-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
       {spots.map(spot => (
         <div
           key={spot.id}
-		  onClick={() => onSpotClick(spot.id, spot.lng, spot.lat)}
+          onClick={() => onSpotClick(spot.id, spot.lng, spot.lat)}
           className="border border-gray-200 rounded-xl p-4 cursor-pointer hover:shadow-md transition-shadow"
         >
           <div className="font-bold text-lg">{spot.name}</div>
