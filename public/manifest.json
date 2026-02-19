@@ -1,6 +1,6 @@
 {
-  "name": "FineDrinking",
-  "short_name": "FD",
+  "name": "HopTrotter",
+  "short_name": "HT",
   "description": "Discover craft beer & natural wine near you",
   "start_url": "/",
   "display": "standalone",
