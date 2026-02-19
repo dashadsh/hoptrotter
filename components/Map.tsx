@@ -75,6 +75,13 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
           </div>
         `)
 
+        popup.on('open', () => {
+          Object.values(markers.current).forEach(m => {
+            const p = m.getPopup()
+            if (p && p !== popup && p.isOpen()) p.remove()
+          })
+        })
+
         const marker = new maplibregl.Marker({ color })
           .setLngLat([spot.lng, spot.lat])
           .setPopup(popup)
