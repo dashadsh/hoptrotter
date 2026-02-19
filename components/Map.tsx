@@ -50,7 +50,7 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
       // Remove markers not in filtered list
       existingIds.forEach(id => {
         if (!currentIds.has(id)) {
-          markers.current[id].getPopup()?.remove()
+          markers.current[id]?.getPopup()?.remove()
           markers.current[id].remove()
           delete markers.current[id]
         }
