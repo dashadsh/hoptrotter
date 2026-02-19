@@ -6,7 +6,7 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import { Spot } from '@/lib/spots'
 
 export interface MapHandle {
-  openSpot: (id: number, lng: number, lat: number) => void
+  openSpot: (id: string, lng: number, lat: number) => void
 }
 
 interface MapProps {
@@ -16,10 +16,10 @@ interface MapProps {
 const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
   const mapContainer = useRef<HTMLDivElement>(null)
   const map = useRef<maplibregl.Map | null>(null)
-  const markers = useRef<{ [id: number]: maplibregl.Marker }>({})
+  const markers = useRef<{ [id: string]: maplibregl.Marker }>({})
 
   useImperativeHandle(ref, () => ({
-    openSpot: (id: number, lng: number, lat: number) => {
+    openSpot: (id: string, lng: number, lat: number) => {
       Object.values(markers.current).forEach(m => m.getPopup()?.remove())
       map.current?.flyTo({ center: [lng, lat], zoom: 15 })
       map.current?.once('moveend', () => {
@@ -39,14 +39,30 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
     })
   }, [])
 
-  // Add markers when spots load
+  // Sync markers with filtered spots
   useEffect(() => {
-    if (!map.current || spots.length === 0) return
+    if (!map.current) return
 
-    const addMarkers = () => {
+    const syncMarkers = () => {
+      const currentIds = new Set(spots.map(s => String(s.id)))
+      const existingIds = new Set(Object.keys(markers.current))
+
+      // Remove markers not in filtered list
+      existingIds.forEach(id => {
+        if (!currentIds.has(id)) {
+          markers.current[id]?.getPopup()?.remove()
+          markers.current[id]?.remove()
+          delete markers.current[id]
+        }
+      })
+
+      // Add markers new to filtered list
       spots.forEach(spot => {
-        const isBeer = spot.drink_type === 'craft_beer'
-        const color = isBeer ? '#e07b39' : '#8b2246'  // orange for beer, dark red for wine
+        const sid = String(spot.id)
+        if (markers.current[sid]) return
+        if (spot.lat == null || spot.lng == null) return
+
+        const color = spot.drink_type === 'craft_beer' ? '#e07b39' : '#8b2246'
 
         const popup = new maplibregl.Popup({
           closeButton: true,
@@ -64,14 +80,14 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
           .setPopup(popup)
           .addTo(map.current!)
 
-        markers.current[spot.id] = marker
+        markers.current[sid] = marker
       })
     }
 
     if (map.current.isStyleLoaded()) {
-      addMarkers()
+      syncMarkers()
     } else {
-      map.current.on('load', addMarkers)
+      map.current.on('load', syncMarkers)
     }
   }, [spots])
 
