@@ -10,6 +10,7 @@ interface Spot {
   lng: number
   lat: number
   types: string[]
+  drink_type: 'craft_beer' | 'natural_wine'
 }
 
 interface Props {
@@ -19,11 +20,13 @@ interface Props {
 
 type SortOrder = 'asc' | 'desc'
 type TypeFilter = 'all' | 'bar' | 'shop'
+type DrinkTypeFilter = 'all' | 'craft_beer' | 'natural_wine'
 
 export default function SpotList({ spots, onSpotClick }: Props) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [districtFilter, setDistrictFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
+  const [drinkTypeFilter, setDrinkTypeFilter] = useState<DrinkTypeFilter>('all')
 
   // Get unique districts from spots
   const districts = useMemo(() => {
@@ -43,6 +46,10 @@ export default function SpotList({ spots, onSpotClick }: Props) {
       result = result.filter(s => s.types?.includes(typeFilter))
     }
 
+    if (drinkTypeFilter !== 'all') {
+      result = result.filter(s => s.drink_type === drinkTypeFilter)
+    }
+
     result.sort((a, b) =>
       sortOrder === 'asc'
         ? a.name.localeCompare(b.name)
@@ -50,10 +57,9 @@ export default function SpotList({ spots, onSpotClick }: Props) {
     )
 
     return result
-  }, [spots, districtFilter, typeFilter, sortOrder])
+  }, [spots, districtFilter, typeFilter, drinkTypeFilter, sortOrder])
 
   const btnBase = 'px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer'
-  const btnActive = 'bg-amber-800 text-white'
   const btnInactive = 'bg-white text-stone-600 border border-stone-300 hover:border-amber-800 hover:text-amber-800'
 
   return (
@@ -64,13 +70,13 @@ export default function SpotList({ spots, onSpotClick }: Props) {
         {/* Sort */}
         <div className="flex items-center gap-1.5 mr-2">
           <button
-            className={`${btnBase} ${sortOrder === 'asc' ? btnActive : btnInactive}`}
+            className={`${btnBase} ${sortOrder === 'asc' ? 'bg-amber-800 text-white' : btnInactive}`}
             onClick={() => setSortOrder('asc')}
           >
             A → Z
           </button>
           <button
-            className={`${btnBase} ${sortOrder === 'desc' ? btnActive : btnInactive}`}
+            className={`${btnBase} ${sortOrder === 'desc' ? 'bg-amber-800 text-white' : btnInactive}`}
             onClick={() => setSortOrder('desc')}
           >
             Z → A
@@ -80,15 +86,40 @@ export default function SpotList({ spots, onSpotClick }: Props) {
         {/* Divider */}
         <div className="w-px h-6 bg-stone-200" />
 
-        {/* Type filter */}
+        {/* Drink type filter */}
+        <div className="flex items-center gap-1.5">
+          <button
+            className={`${btnBase} ${drinkTypeFilter === 'all' ? 'bg-amber-800 text-white' : btnInactive}`}
+            onClick={() => setDrinkTypeFilter('all')}
+          >
+            All
+          </button>
+          <button
+            className={`${btnBase} ${drinkTypeFilter === 'craft_beer' ? 'bg-[#e07b39] text-white border-transparent' : btnInactive}`}
+            onClick={() => setDrinkTypeFilter('craft_beer')}
+          >
+            Beer
+          </button>
+          <button
+            className={`${btnBase} ${drinkTypeFilter === 'natural_wine' ? 'bg-[#8b2246] text-white border-transparent' : btnInactive}`}
+            onClick={() => setDrinkTypeFilter('natural_wine')}
+          >
+            Wine
+          </button>
+        </div>
+
+        {/* Divider */}
+        <div className="w-px h-6 bg-stone-200" />
+
+        {/* Type filter (bar / shop) */}
         <div className="flex items-center gap-1.5">
           {(['all', 'bar', 'shop'] as TypeFilter[]).map(t => (
             <button
               key={t}
-              className={`${btnBase} ${typeFilter === t ? btnActive : btnInactive}`}
+              className={`${btnBase} ${typeFilter === t ? 'bg-amber-800 text-white' : btnInactive}`}
               onClick={() => setTypeFilter(t)}
             >
-              {t === 'all' ? 'All' : t === 'bar' ? 'Bar' : 'Shop'}
+              {t === 'all' ? 'All types' : t === 'bar' ? 'Bar' : 'Shop'}
             </button>
           ))}
         </div>
@@ -125,7 +156,15 @@ export default function SpotList({ spots, onSpotClick }: Props) {
               onClick={() => onSpotClick(spot.id, spot.lng, spot.lat)}
               className="border border-stone-200 rounded-xl p-4 cursor-pointer hover:shadow-md hover:border-amber-300 transition-all"
             >
-              <div className="font-bold text-base">{spot.name}</div>
+              <div className="flex items-start justify-between gap-2">
+                <div className="font-bold text-base">{spot.name}</div>
+                <span
+                  className="shrink-0 text-xs font-medium px-2 py-0.5 rounded-full text-white mt-0.5"
+                  style={{ backgroundColor: spot.drink_type === 'craft_beer' ? '#e07b39' : '#8b2246' }}
+                >
+                  {spot.drink_type === 'craft_beer' ? 'Beer' : 'Wine'}
+                </span>
+              </div>
               <div className="text-stone-400 text-sm mt-1">{spot.address}</div>
               <div className="flex items-center justify-between mt-3">
                 <span className="text-amber-800 text-xs font-medium uppercase tracking-wide">

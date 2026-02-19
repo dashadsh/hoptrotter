@@ -6,4 +6,5 @@ export interface Spot {
   lng: number
   lat: number
   types: string[]   // e.g. ['bar'], ['shop'], ['bar', 'shop']
+  drink_type: 'craft_beer' | 'natural_wine'
 }

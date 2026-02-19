@@ -5,9 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "HopTrotter",
-  description: "Your local beer guide",
-};
+  title: 'FineDrinking',
+  description: 'Discover craft beer & natural wine near you',
+}
 
 export default function RootLayout({
   children,

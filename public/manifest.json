@@ -1,9 +1,9 @@
 {
-  "name": "HopTrotter",
-  "short_name": "HopTrotter",
-  "description": "Your local beer guide",
+  "name": "FineDrinking",
+  "short_name": "FD",
+  "description": "Discover craft beer & natural wine near you",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0f0f",
-  "theme_color": "#0f0f0f",
+  "theme_color": "#0f0f0f"
 }

@@ -45,6 +45,9 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
 
     const addMarkers = () => {
       spots.forEach(spot => {
+        const isBeer = spot.drink_type === 'craft_beer'
+        const color = isBeer ? '#e07b39' : '#8b2246'  // orange for beer, dark red for wine
+
         const popup = new maplibregl.Popup({
           closeButton: true,
           className: 'beer-popup',
@@ -56,7 +59,7 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
           </div>
         `)
 
-        const marker = new maplibregl.Marker({ color: '#f59e0b' })
+        const marker = new maplibregl.Marker({ color })
           .setLngLat([spot.lng, spot.lat])
           .setPopup(popup)
           .addTo(map.current!)
