@@ -39,14 +39,28 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
     })
   }, [])
 
-  // Add markers when spots load
+  // Sync markers with filtered spots
   useEffect(() => {
-    if (!map.current || spots.length === 0) return
+    if (!map.current) return
 
-    const addMarkers = () => {
+    const syncMarkers = () => {
+      const currentIds = new Set(spots.map(s => s.id))
+      const existingIds = new Set(Object.keys(markers.current).map(Number))
+
+      // Remove markers not in filtered list
+      existingIds.forEach(id => {
+        if (!currentIds.has(id)) {
+          markers.current[id].getPopup()?.remove()
+          markers.current[id].remove()
+          delete markers.current[id]
+        }
+      })
+
+      // Add markers new to filtered list
       spots.forEach(spot => {
-        const isBeer = spot.drink_type === 'craft_beer'
-        const color = isBeer ? '#e07b39' : '#8b2246'  // orange for beer, dark red for wine
+        if (markers.current[spot.id]) return
+
+        const color = spot.drink_type === 'craft_beer' ? '#e07b39' : '#8b2246'
 
         const popup = new maplibregl.Popup({
           closeButton: true,
@@ -69,9 +83,9 @@ const Map = forwardRef<MapHandle, MapProps>(({ spots }, ref) => {
     }
 
     if (map.current.isStyleLoaded()) {
-      addMarkers()
+      syncMarkers()
     } else {
-      map.current.on('load', addMarkers)
+      map.current.on('load', syncMarkers)
     }
   }, [spots])
 

@@ -13,28 +13,27 @@ interface Spot {
   drink_type: 'craft_beer' | 'natural_wine'
 }
 
+type DrinkFilter = 'all' | 'craft_beer' | 'natural_wine'
+type SortOrder = 'asc' | 'desc'
+type TypeFilter = 'all' | 'bar' | 'shop'
+
 interface Props {
   spots: Spot[]
+  drinkFilter: DrinkFilter
+  onDrinkFilterChange: (filter: DrinkFilter) => void
   onSpotClick: (id: number, lng: number, lat: number) => void
 }
 
-type SortOrder = 'asc' | 'desc'
-type TypeFilter = 'all' | 'bar' | 'shop'
-type DrinkTypeFilter = 'all' | 'craft_beer' | 'natural_wine'
-
-export default function SpotList({ spots, onSpotClick }: Props) {
+export default function SpotList({ spots, drinkFilter, onDrinkFilterChange, onSpotClick }: Props) {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc')
   const [districtFilter, setDistrictFilter] = useState<string>('all')
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all')
-  const [drinkTypeFilter, setDrinkTypeFilter] = useState<DrinkTypeFilter>('all')
 
-  // Get unique districts from spots
   const districts = useMemo(() => {
     const unique = Array.from(new Set(spots.map(s => s.neighborhood).filter(Boolean)))
     return unique.sort()
   }, [spots])
 
-  // Apply filters + sort
   const filtered = useMemo(() => {
     let result = [...spots]
 
@@ -46,10 +45,6 @@ export default function SpotList({ spots, onSpotClick }: Props) {
       result = result.filter(s => s.types?.includes(typeFilter))
     }
 
-    if (drinkTypeFilter !== 'all') {
-      result = result.filter(s => s.drink_type === drinkTypeFilter)
-    }
-
     result.sort((a, b) =>
       sortOrder === 'asc'
         ? a.name.localeCompare(b.name)
@@ -57,14 +52,13 @@ export default function SpotList({ spots, onSpotClick }: Props) {
     )
 
     return result
-  }, [spots, districtFilter, typeFilter, drinkTypeFilter, sortOrder])
+  }, [spots, districtFilter, typeFilter, sortOrder])
 
   const btnBase = 'px-3 py-1.5 rounded-full text-sm font-medium transition-colors cursor-pointer'
   const btnInactive = 'bg-white text-stone-600 border border-stone-300 hover:border-amber-800 hover:text-amber-800'
 
   return (
     <div className="px-8 pb-10">
-      {/* Controls bar */}
       <div className="flex flex-wrap items-center gap-3 mb-6 pt-2">
 
         {/* Sort */}
@@ -83,35 +77,33 @@ export default function SpotList({ spots, onSpotClick }: Props) {
           </button>
         </div>
 
-        {/* Divider */}
         <div className="w-px h-6 bg-stone-200" />
 
-        {/* Drink type filter */}
+        {/* Drink type filter — controlled by parent */}
         <div className="flex items-center gap-1.5">
           <button
-            className={`${btnBase} ${drinkTypeFilter === 'all' ? 'bg-amber-800 text-white' : btnInactive}`}
-            onClick={() => setDrinkTypeFilter('all')}
+            className={`${btnBase} ${drinkFilter === 'all' ? 'bg-amber-800 text-white' : btnInactive}`}
+            onClick={() => onDrinkFilterChange('all')}
           >
             All
           </button>
           <button
-            className={`${btnBase} ${drinkTypeFilter === 'craft_beer' ? 'bg-[#e07b39] text-white border-transparent' : btnInactive}`}
-            onClick={() => setDrinkTypeFilter('craft_beer')}
+            className={`${btnBase} ${drinkFilter === 'craft_beer' ? 'bg-[#e07b39] text-white border-transparent' : btnInactive}`}
+            onClick={() => onDrinkFilterChange('craft_beer')}
           >
             Beer
           </button>
           <button
-            className={`${btnBase} ${drinkTypeFilter === 'natural_wine' ? 'bg-[#8b2246] text-white border-transparent' : btnInactive}`}
-            onClick={() => setDrinkTypeFilter('natural_wine')}
+            className={`${btnBase} ${drinkFilter === 'natural_wine' ? 'bg-[#8b2246] text-white border-transparent' : btnInactive}`}
+            onClick={() => onDrinkFilterChange('natural_wine')}
           >
             Wine
           </button>
         </div>
 
-        {/* Divider */}
         <div className="w-px h-6 bg-stone-200" />
 
-        {/* Type filter (bar / shop) */}
+        {/* Type filter */}
         <div className="flex items-center gap-1.5">
           {(['all', 'bar', 'shop'] as TypeFilter[]).map(t => (
             <button
@@ -124,7 +116,6 @@ export default function SpotList({ spots, onSpotClick }: Props) {
           ))}
         </div>
 
-        {/* Divider */}
         <div className="w-px h-6 bg-stone-200" />
 
         {/* District filter */}
@@ -139,13 +130,11 @@ export default function SpotList({ spots, onSpotClick }: Props) {
           ))}
         </select>
 
-        {/* Result count */}
         <span className="ml-auto text-sm text-stone-400">
           {filtered.length} {filtered.length === 1 ? 'spot' : 'spots'}
         </span>
       </div>
 
-      {/* Cards grid */}
       {filtered.length === 0 ? (
         <p className="text-stone-400 text-sm py-8 text-center">No spots match your filters.</p>
       ) : (
