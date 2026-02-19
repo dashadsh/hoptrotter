@@ -6,7 +6,7 @@ export default function Header() {
         {/* <span className="text-gray-400 text-sm ml-3">Find your perfect pint</span> */}
       </div>
       <nav className="text-sm text-amber-200">
-        <span>Discover craft beer & natural wine around you</span>
+        <span>Discover craft beer & natural wine near you</span>
       </nav>
     </header>
   )

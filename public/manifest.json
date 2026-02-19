@@ -1,7 +1,7 @@
 {
   "name": "FineDrinking",
   "short_name": "FD",
-  "description": "Discover craft beer & natural wine spots aroun you",
+  "description": "Discover craft beer & natural wine near you",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0f0f0f",

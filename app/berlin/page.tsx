@@ -22,7 +22,7 @@ export default function BerlinPage() {
       <Header />
       <div className="px-8 py-6">
         <h1 className="text-4xl font-bold">Berlin</h1>
-        <p className="text-gray-500 mt-1">Your local guide · {spots.length} FineDrinking spots near you</p>
+        <p className="text-gray-500 mt-1">Your local guide · {spots.length} spots</p>
       </div>
       <Map ref={mapRef} spots={spots} />
       <SpotList spots={spots} onSpotClick={(id, lng, lat) => mapRef.current?.openSpot(id, lng, lat)} />
