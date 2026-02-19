@@ -5,4 +5,5 @@ export interface Spot {
   neighborhood: string
   lng: number
   lat: number
+  types: string[]   // e.g. ['bar'], ['shop'], ['bar', 'shop']
 }
